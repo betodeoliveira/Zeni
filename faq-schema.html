@@ -1,14 +1,58 @@
-<script type="application/ld+json">
-    {
+<script>
+  let externalFAQData = [];
+  let faqAmount = $(".faqs_item").length;
+  let currentAmount = 0;
+
+  function addVariable(question, answer) {
+    // console.log("adding question");
+    currentAmount++;
+    externalFAQData.push({
+      question: question,
+      answer: answer
+    });
+
+    if (currentAmount >= faqAmount) {
+      // console.log("publishing schema");
+      // Call the function with the external array
+      addFAQSchema(externalFAQData);
+    }
+  }
+
+  function addFAQSchema(faqData) {
+    var faqContainer = document.createElement('script');
+    faqContainer.type = 'application/ld+json';
+
+    // Create FAQ schema based on the external array
+    var faqSchema = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": {
+      "mainEntity": []
+    };
+
+    // Populate mainEntity from the external array
+    faqData.forEach(function (faqItem) {
+      var questionAnswer = {
         "@type": "Question",
-        "name": "",
+        "name": faqItem.question,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": ""
+          "text": faqItem.answer
         }
-      }
-    }
+      };
+      faqSchema.mainEntity.push(questionAnswer);
+    });
+
+    // Set the FAQ schema as innerHTML
+    faqContainer.innerHTML = JSON.stringify(faqSchema);
+
+    // Append the script element to the head
+    document.head.appendChild(faqContainer);
+  }
+</script>
+
+<script>
+  var Webflow = Webflow || [];
+  Webflow.push(function () {
+    addVariable();
+  });
 </script>
